@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aplikasi Koperasi Digital</title>
+    <!-- Menggunakan Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Menggunakan Google Fonts untuk tampilan yang lebih bersih -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Icon Library (untuk tombol hapus/edit) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .hidden {
+        display: none;
+      }
+      .status-disetujui {
+        background-color: #d1fae5;
+        color: #065f46;
+      }
+      .status-ditolak {
+        background-color: #fee2e2;
+        color: #991b1b;
+      }
+      .status-menunggu {
+        background-color: #fef3c7;
+        color: #92400e;
+      }
+      .status-lunas {
+        background-color: #e0e7ff;
+        color: #3730a3;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Kontainer Utama Aplikasi -->
+    <div id="app">
+      <!-- ===== BAGIAN LOGIN ===== -->
+      <section
+        id="login-section"
+        class="min-h-screen flex items-center justify-center p-4"
+      >
+        <div class="w-full max-w-md">
+          <div class="bg-white p-8 rounded-xl shadow-lg">
+            <div class="text-center mb-8">
+              <h1 class="text-2xl font-bold text-gray-800">
+                Koperasi Sejahtera Bersama
+              </h1>
+              <p class="text-gray-500">Silakan login ke akun Anda</p>
+            </div>
+            <form id="login-form">
+              <div class="mb-4">
+                <label
+                  for="email"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Email</label
+                ><input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="contoh: sekretaris@koperasi.com"
+                  required
+                />
+              </div>
+              <div class="mb-6">
+                <label
+                  for="password"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Password</label
+                ><input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Masukkan password"
+                  required
+                />
+              </div>
+              <div
+                id="login-error"
+                class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4"
+                role="alert"
+              ></div>
+              <button
+                type="submit"
+                id="login-button"
+                class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
+              >
+                Login
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== BAGIAN DASHBOARD ===== -->
+      <section id="dashboard-section" class="hidden">
+        <header class="bg-white shadow-md">
+          <div
+            class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center"
+          >
+            <h1 class="text-xl font-bold text-gray-800">Dashboard Koperasi</h1>
+            <button
+              id="logout-button"
+              class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600"
+            >
+              Logout
+            </button>
+          </div>
+        </header>
+        <main
+          id="dashboard-main"
+          class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8"
+        >
+          <div
+            id="welcome-message"
+            class="bg-blue-100 text-blue-800 p-4 rounded-lg mb-6"
+          ></div>
+          <div
+            id="dashboard-content"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          ></div>
+        </main>
+      </section>
+
+      <!-- ===== BAGIAN MANAJEMEN ANGGOTA (Khusus Sekretaris) ===== -->
+      <section id="manajemen-anggota-section" class="hidden">
+        <header class="bg-white shadow-md">
+          <div
+            class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center"
+          >
+            <h1 class="text-xl font-bold text-gray-800">
+              Manajemen Data Anggota
+            </h1>
+            <button
+              class="back-to-dashboard bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
+            >
+              Kembali
+            </button>
+          </div>
+        </header>
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-lg font-semibold mb-4">Tambah Anggota Baru</h2>
+            <form
+              id="tambah-anggota-form"
+              class="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+              <input
+                type="text"
+                id="nama-anggota"
+                placeholder="Nama Lengkap"
+                class="px-4 py-2 border rounded-lg"
+                required
+              /><input
+                type="email"
+                id="email-anggota"
+                placeholder="Email (untuk login anggota)"
+                class="px-4 py-2 border rounded-lg"
+                required
+              /><input
+                type="text"
+                id="no-ktp"
+                placeholder="No. KTP"
+                class="px-4 py-2 border rounded-lg"
+                required
+              /><input
+                type="text"
+                id="alamat-anggota"
+                placeholder="Alamat"
+                class="px-4 py-2 border rounded-lg"
+                required
+              /><button
+                type="submit"
+                class="md:col-span-2 w-full bg-green-600 text-white font-bold py-2 rounded-lg hover:bg-green-700"
+              >
+                Tambah Anggota
+              </button>
+            </form>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-semibold mb-4">Daftar Anggota</h2>
+            <div class="overflow-x-auto">
+              <table class="min-w-full bg-white">
+                <thead class="bg-gray-200">
+                  <tr>
+                    <th class="py-2 px-4 text-left">Nama</th>
+                    <th class="py-2 px-4 text-left">Email</th>
+                    <th class="py-2 px-4 text-left">No. KTP</th>
+                    <th class="py-2 px-4 text-left">Alamat</th>
+                  </tr>
+                </thead>
+                <tbody id="daftar-anggota-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </section>
+
+      <!-- ===== BAGIAN MANAJEMEN SIMPANAN (Khusus Bendahara) ===== -->
+      <section id="manajemen-simpanan-section" class="hidden">
+        <header class="bg-white shadow-md">
+          <div
+            class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center"
+          >
+            <h1 class="text-xl font-bold text-gray-800">Manajemen Simpanan</h1>
+            <button
+              class="back-to-dashboard bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
+            >
+              Kembali
+            </button>
+          </div>
+        </header>
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-lg font-semibold mb-4">Input Setoran Simpanan</h2>
+            <form
+              id="tambah-simpanan-form"
+              class="grid grid-cols-1 md:grid-cols-3 gap-4"
+            >
+              <select
+                id="anggota-simpanan"
+                class="px-4 py-2 border rounded-lg"
+                required
+              >
+                <option value="">Pilih Anggota...</option></select
+              ><select
+                id="jenis-simpanan"
+                class="px-4 py-2 border rounded-lg"
+                required
+              >
+                <option value="Wajib">Simpanan Wajib</option>
+                <option value="Sukarela">Simpanan Sukarela</option></select
+              ><input
+                type="number"
+                id="jumlah-simpanan"
+                placeholder="Jumlah Setoran"
+                class="px-4 py-2 border rounded-lg"
+                required
+              /><button
+                type="submit"
+                class="md:col-span-3 w-full bg-green-600 text-white font-bold py-2 rounded-lg hover:bg-green-700"
+              >
+                Simpan Transaksi
+              </button>
+            </form>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-semibold mb-4">Riwayat Setoran Simpanan</h2>
+            <div class="overflow-x-auto">
+              <table class="min-w-full bg-white">
+                <thead class="bg-gray-200">
+                  <tr>
+                    <th class="py-2 px-4 text-left">Tanggal</th>
+                    <th class="py-2 px-4 text-left">Nama Anggota</th>
+                    <th class="py-2 px-4 text-left">Jenis</th>
+                    <th class="py-2 px-4 text-right">Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody id="riwayat-simpanan-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </section>
+
+      <!-- ===== BAGIAN DASHBOARD ANGGOTA ===== -->
+      <section id="dashboard-anggota-section" class="hidden">
+        <header class="bg-white shadow-md">
+          <div
+            class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center"
+          >
+            <h1 class="text-xl font-bold text-gray-800">Informasi Akun Saya</h1>
+            <button
+              class="back-to-dashboard bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
+            >
+              Kembali
+            </button>
+          </div>
+        </header>
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div class="bg-white p-8 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">
+              Total Saldo Simpanan Anda
+            </h2>
+            <p
+              id="total-simpanan"
+              class="text-4xl font-bold text-blue-600 mb-6"
+            >
+              Rp 0
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-6">
+              <div>
+                <p class="text-sm text-gray-500">Simpanan Wajib</p>
+                <p id="saldo-wajib" class="text-xl font-semibold">Rp 0</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">Simpanan Sukarela</p>
+                <p id="saldo-sukarela" class="text-xl font-semibold">Rp 0</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white p-8 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">
+              Status Pinjaman Aktif
+            </h2>
+            <div id="info-pinjaman-anggota">Memuat data pinjaman...</div>
+          </div>
+        </main>
+      </section>
+
+      <!-- ===== BAGIAN MANAJEMEN PINJAMAN (Khusus Bendahara) ===== -->
+      <section id="manajemen-pinjaman-section" class="hidden">
+        <header class="bg-white shadow-md">
+          <div
+            class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center"
+          >
+            <h1 class="text-xl font-bold text-gray-800">Manajemen Pinjaman</h1>
+            <button
+              class="back-to-dashboard bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
+            >
+              Kembali
+            </button>
+          </div>
+        </header>
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-lg font-semibold mb-4">
+              Buat Pengajuan Pinjaman Baru
+            </h2>
+            <form
+              id="tambah-pinjaman-form"
+              class="grid grid-cols-1 md:grid-cols-3 gap-4"
+            >
+              <select
+                id="anggota-pinjaman"
+                class="px-4 py-2 border rounded-lg"
+                required
+              >
+                <option value="">Pilih Anggota...</option></select
+              ><input
+                type="number"
+                id="jumlah-pinjaman"
+                placeholder="Jumlah Pinjaman"
+                class="px-4 py-2 border rounded-lg"
+                required
+              /><input
+                type="number"
+                id="tenor-pinjaman"
+                placeholder="Tenor (bulan)"
+                class="px-4 py-2 border rounded-lg"
+                required
+              /><button
+                type="submit"
+                class="md:col-span-3 w-full bg-green-600 text-white font-bold py-2 rounded-lg hover:bg-green-700"
+              >
+                Ajukan Pinjaman
+              </button>
+            </form>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-semibold mb-4">Daftar Semua Pinjaman</h2>
+            <div class="overflow-x-auto">
+              <table class="min-w-full bg-white">
+                <thead class="bg-gray-200">
+                  <tr>
+                    <th class="py-2 px-4 text-left">Tanggal</th>
+                    <th class="py-2 px-4 text-left">Nama Anggota</th>
+                    <th class="py-2 px-4 text-right">Jumlah</th>
+                    <th class="py-2 px-4 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="riwayat-pinjaman-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </section>
+
+      <!-- ===== BAGIAN PERSETUJUAN PINJAMAN (Khusus Ketua) ===== -->
+      <section id="persetujuan-pinjaman-section" class="hidden">
+        <header class="bg-white shadow-md">
+          <div
+            class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center"
+          >
+            <h1 class="text-xl font-bold text-gray-800">
+              Persetujuan Pinjaman
+            </h1>
+            <button
+              class="back-to-dashboard bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
+            >
+              Kembali
+            </button>
+          </div>
+        </header>
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-semibold mb-4">
+              Daftar Pengajuan Pinjaman
+            </h2>
+            <div class="overflow-x-auto">
+              <table class="min-w-full bg-white">
+                <thead class="bg-gray-200">
+                  <tr>
+                    <th class="py-2 px-4 text-left">Tanggal</th>
+                    <th class="py-2 px-4 text-left">Nama Anggota</th>
+                    <th class="py-2 px-4 text-right">Jumlah</th>
+                    <th class="py-2 px-4 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="persetujuan-pinjaman-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </section>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+      // --- KONFIGURASI FIREBASE ---
+      const firebaseConfig = {
+        apiKey: "4",
+        authDomain: "",
+        projectId: "",
+        storageBucket: "",
+        messagingSenderId: "706010090524",
+        appId: "",
+        measurementId: "",
+      };
+
+      // --- INISIALISASI FIREBASE ---
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+      const anggotaCollection = db.collection("anggota");
+      const simpananCollection = db.collection("simpanan");
+      const pinjamanCollection = db.collection("pinjaman");
+
+      // --- ELEMEN DOM ---
+      const loginSection = document.getElementById("login-section");
+      const dashboardSection = document.getElementById("dashboard-section");
+      const manajemenAnggotaSection = document.getElementById(
+        "manajemen-anggota-section"
+      );
+      const manajemenSimpananSection = document.getElementById(
+        "manajemen-simpanan-section"
+      );
+      const dashboardAnggotaSection = document.getElementById(
+        "dashboard-anggota-section"
+      );
+      const manajemenPinjamanSection = document.getElementById(
+        "manajemen-pinjaman-section"
+      );
+      const persetujuanPinjamanSection = document.getElementById(
+        "persetujuan-pinjaman-section"
+      );
+
+      const loginForm = document.getElementById("login-form");
+      const logoutButton = document.getElementById("logout-button");
+      const welcomeMessage = document.getElementById("welcome-message");
+      const dashboardContent = document.getElementById("dashboard-content");
+
+      const formatRupiah = (angka) =>
+        new Intl.NumberFormat("id-ID", {
+          style: "currency",
+          currency: "IDR",
+          minimumFractionDigits: 0,
+        }).format(angka);
+
+      // --- FUNGSI TAMPILAN ---
+      function showView(viewId) {
+        document
+          .querySelectorAll("#app > section")
+          .forEach((section) => section.classList.add("hidden"));
+        document.getElementById(viewId).classList.remove("hidden");
+      }
+
+      // --- LOGIKA AUTENTIKASI ---
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        auth
+          .signInWithEmailAndPassword(
+            document.getElementById("email").value,
+            document.getElementById("password").value
+          )
+          .catch((error) => {
+            document.getElementById("login-error").textContent =
+              "Email atau password salah.";
+            document.getElementById("login-error").classList.remove("hidden");
+          });
+      });
+
+      logoutButton.addEventListener("click", () => auth.signOut());
+
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          const role = user.email.split("@")[0];
+          welcomeMessage.innerHTML = `<p><span class="font-bold">Selamat Datang, ${user.email}!</span> Anda login sebagai ${role}.</p>`;
+          renderDashboardContent(role);
+          showView("dashboard-section");
+        } else {
+          showView("login-section");
+          loginForm.reset();
+        }
+      });
+
+      // --- LOGIKA DASHBOARD ---
+      function renderDashboardContent(role) {
+        dashboardContent.innerHTML = "";
+        let menuItems = [];
+        switch (role) {
+          case "sekretaris":
+            menuItems = [
+              {
+                id: "kelola-anggota",
+                title: "Kelola Data Anggota",
+                icon: "👥",
+              },
+            ];
+            break;
+          case "bendahara":
+            menuItems = [
+              { id: "kelola-simpanan", title: "Kelola Simpanan", icon: "💰" },
+              { id: "kelola-pinjaman", title: "Kelola Pinjaman", icon: "💸" },
+            ];
+            break;
+          case "ketua":
+            menuItems = [
+              {
+                id: "persetujuan-pinjaman",
+                title: "Persetujuan Pinjaman",
+                icon: "✅",
+              },
+            ];
+            break;
+          case "anggota":
+            menuItems = [
+              {
+                id: "lihat-saldo",
+                title: "Lihat Saldo & Info Saya",
+                icon: "💳",
+              },
+            ];
+            break;
+          default:
+            menuItems = [{ id: "info", title: "Informasi Umum", icon: "ℹ️" }];
+        }
+
+        menuItems.forEach((item) => {
+          const card = `<div id="${item.id}" class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"><div class="text-4xl mb-3">${item.icon}</div><h3 class="text-lg font-semibold text-gray-800">${item.title}</h3></div>`;
+          dashboardContent.innerHTML += card;
+        });
+
+        document
+          .getElementById("kelola-anggota")
+          ?.addEventListener("click", () => {
+            showView("manajemen-anggota-section");
+            tampilkanAnggota();
+          });
+        document
+          .getElementById("kelola-simpanan")
+          ?.addEventListener("click", () => {
+            showView("manajemen-simpanan-section");
+            loadAnggotaUntukSelect("anggota-simpanan");
+            tampilkanRiwayatSimpanan();
+          });
+        document
+          .getElementById("kelola-pinjaman")
+          ?.addEventListener("click", () => {
+            showView("manajemen-pinjaman-section");
+            loadAnggotaUntukSelect("anggota-pinjaman");
+            tampilkanRiwayatPinjaman();
+          });
+        document
+          .getElementById("persetujuan-pinjaman")
+          ?.addEventListener("click", () => {
+            showView("persetujuan-pinjaman-section");
+            tampilkanPengajuanUntukPersetujuan();
+          });
+        document
+          .getElementById("lihat-saldo")
+          ?.addEventListener("click", () => {
+            showView("dashboard-anggota-section");
+            tampilkanInfoPribadi();
+          });
+      }
+
+      // --- LOGIKA MANAJEMEN ANGGOTA (SEKRETARIS) ---
+      document
+        .getElementById("tambah-anggota-form")
+        .addEventListener("submit", (e) => {
+          e.preventDefault();
+          anggotaCollection
+            .add({
+              nama: document.getElementById("nama-anggota").value,
+              email: document.getElementById("email-anggota").value,
+              no_ktp: document.getElementById("no-ktp").value,
+              alamat: document.getElementById("alamat-anggota").value,
+              tanggal_bergabung:
+                firebase.firestore.FieldValue.serverTimestamp(),
+            })
+            .then(() => document.getElementById("tambah-anggota-form").reset());
+        });
+
+      function tampilkanAnggota() {
+        anggotaCollection.orderBy("nama").onSnapshot((snapshot) => {
+          const tbody = document.getElementById("daftar-anggota-body");
+          tbody.innerHTML = "";
+          if (snapshot.empty) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Belum ada data anggota.</td></tr>`;
+            return;
+          }
+          snapshot.forEach((doc) => {
+            const anggota = doc.data();
+            tbody.innerHTML += `<tr class="border-b"><td class="py-2 px-4">${anggota.nama}</td><td class="py-2 px-4">${anggota.email}</td><td class="py-2 px-4">${anggota.no_ktp}</td><td class="py-2 px-4">${anggota.alamat}</td></tr>`;
+          });
+        });
+      }
+
+      // --- LOGIKA MANAJEMEN SIMPANAN & PINJAMAN (UMUM) ---
+      async function loadAnggotaUntukSelect(selectId) {
+        const selectEl = document.getElementById(selectId);
+        selectEl.innerHTML = '<option value="">Memuat anggota...</option>';
+        try {
+          const snapshot = await anggotaCollection.orderBy("nama").get();
+          if (snapshot.empty) {
+            selectEl.innerHTML = '<option value="">Belum ada anggota</option>';
+            return;
+          }
+          let options = '<option value="">Pilih Anggota...</option>';
+          snapshot.forEach((doc) => {
+            options += `<option value="${doc.id}|${doc.data().nama}">${
+              doc.data().nama
+            }</option>`;
+          });
+          selectEl.innerHTML = options;
+        } catch (error) {
+          console.error("Error memuat anggota: ", error);
+        }
+      }
+
+      async function getAnggotaMap() {
+        const anggotaMap = new Map();
+        const anggotaSnapshot = await anggotaCollection.get();
+        anggotaSnapshot.forEach((doc) => {
+          anggotaMap.set(doc.id, doc.data().nama);
+        });
+        return anggotaMap;
+      }
+
+      // --- LOGIKA MANAJEMEN SIMPANAN (BENDAHARA) ---
+      document
+        .getElementById("tambah-simpanan-form")
+        .addEventListener("submit", (e) => {
+          e.preventDefault();
+          const [anggotaId, namaAnggota] = document
+            .getElementById("anggota-simpanan")
+            .value.split("|");
+          const jenis = document.getElementById("jenis-simpanan").value;
+          const jumlah = parseFloat(
+            document.getElementById("jumlah-simpanan").value
+          );
+          if (!anggotaId || !jenis || !jumlah) {
+            alert("Harap lengkapi semua data!");
+            return;
+          }
+          simpananCollection
+            .add({
+              anggotaId: anggotaId,
+              namaAnggota: namaAnggota, // Simpan nama untuk kemudahan query
+              jenis: jenis,
+              jumlah: jumlah,
+              tanggal: firebase.firestore.FieldValue.serverTimestamp(),
+            })
+            .then(() =>
+              document.getElementById("tambah-simpanan-form").reset()
+            );
+        });
+
+      async function tampilkanRiwayatSimpanan() {
+        simpananCollection.orderBy("tanggal", "desc").onSnapshot((snapshot) => {
+          const tbody = document.getElementById("riwayat-simpanan-body");
+          tbody.innerHTML = "";
+          if (snapshot.empty) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Belum ada riwayat setoran.</td></tr>`;
+            return;
+          }
+          snapshot.forEach((doc) => {
+            const simpanan = doc.data();
+            const tanggal = simpanan.tanggal
+              ? simpanan.tanggal.toDate().toLocaleDateString("id-ID")
+              : "N/A";
+            tbody.innerHTML += `<tr class="border-b"><td class="py-2 px-4">${tanggal}</td><td class="py-2 px-4">${
+              simpanan.namaAnggota
+            }</td><td class="py-2 px-4">${
+              simpanan.jenis
+            }</td><td class="py-2 px-4 text-right">${formatRupiah(
+              simpanan.jumlah
+            )}</td></tr>`;
+          });
+        });
+      }
+
+      // --- LOGIKA MANAJEMEN PINJAMAN (BENDAHARA) ---
+      document
+        .getElementById("tambah-pinjaman-form")
+        .addEventListener("submit", (e) => {
+          e.preventDefault();
+          const [anggotaId, namaAnggota] = document
+            .getElementById("anggota-pinjaman")
+            .value.split("|");
+          const jumlah = parseFloat(
+            document.getElementById("jumlah-pinjaman").value
+          );
+          const tenor = parseInt(
+            document.getElementById("tenor-pinjaman").value
+          );
+          if (!anggotaId || !jumlah || !tenor) {
+            alert("Harap lengkapi semua data!");
+            return;
+          }
+          pinjamanCollection
+            .add({
+              anggotaId: anggotaId,
+              namaAnggota: namaAnggota,
+              jumlah: jumlah,
+              tenor: tenor,
+              status: "Menunggu Persetujuan",
+              tanggalPengajuan: firebase.firestore.FieldValue.serverTimestamp(),
+            })
+            .then(() =>
+              document.getElementById("tambah-pinjaman-form").reset()
+            );
+        });
+
+      async function tampilkanRiwayatPinjaman() {
+        pinjamanCollection
+          .orderBy("tanggalPengajuan", "desc")
+          .onSnapshot((snapshot) => {
+            const tbody = document.getElementById("riwayat-pinjaman-body");
+            tbody.innerHTML = "";
+            if (snapshot.empty) {
+              tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Belum ada riwayat pinjaman.</td></tr>`;
+              return;
+            }
+            snapshot.forEach((doc) => {
+              const pinjaman = doc.data();
+              const tanggal = pinjaman.tanggalPengajuan
+                ? pinjaman.tanggalPengajuan.toDate().toLocaleDateString("id-ID")
+                : "N/A";
+              const statusClass = `status-${pinjaman.status
+                .toLowerCase()
+                .replace(" ", "-")}`;
+              tbody.innerHTML += `<tr class="border-b"><td class="py-2 px-4">${tanggal}</td><td class="py-2 px-4">${
+                pinjaman.namaAnggota
+              }</td><td class="py-2 px-4 text-right">${formatRupiah(
+                pinjaman.jumlah
+              )}</td><td class="py-2 px-4 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">${
+                pinjaman.status
+              }</span></td></tr>`;
+            });
+          });
+      }
+
+      // --- LOGIKA PERSETUJUAN PINJAMAN (KETUA) ---
+      async function tampilkanPengajuanUntukPersetujuan() {
+        pinjamanCollection
+          .where("status", "==", "Menunggu Persetujuan")
+          .orderBy("tanggalPengajuan", "asc")
+          .onSnapshot((snapshot) => {
+            const tbody = document.getElementById("persetujuan-pinjaman-body");
+            tbody.innerHTML = "";
+            if (snapshot.empty) {
+              tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Tidak ada pengajuan pinjaman baru.</td></tr>`;
+              return;
+            }
+            snapshot.forEach((doc) => {
+              const pinjaman = doc.data();
+              const tanggal = pinjaman.tanggalPengajuan
+                ? pinjaman.tanggalPengajuan.toDate().toLocaleDateString("id-ID")
+                : "N/A";
+              tbody.innerHTML += `<tr class="border-b"><td class="py-2 px-4">${tanggal}</td><td class="py-2 px-4">${
+                pinjaman.namaAnggota
+              }</td><td class="py-2 px-4 text-right">${formatRupiah(
+                pinjaman.jumlah
+              )}</td><td class="py-2 px-4 text-center"><button onclick="updateStatusPinjaman('${
+                doc.id
+              }', 'Disetujui')" class="bg-green-500 text-white px-3 py-1 rounded-lg text-sm mr-2 hover:bg-green-600">Setujui</button><button onclick="updateStatusPinjaman('${
+                doc.id
+              }', 'Ditolak')" class="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600">Tolak</button></td></tr>`;
+            });
+          });
+      }
+
+      function updateStatusPinjaman(id, status) {
+        if (
+          !confirm(
+            `Apakah Anda yakin ingin ${status.toLowerCase()} pinjaman ini?`
+          )
+        )
+          return;
+        pinjamanCollection.doc(id).update({ status: status });
+      }
+
+      // --- LOGIKA DASHBOARD ANGGOTA ---
+      async function tampilkanInfoPribadi() {
+        try {
+          const currentUserEmail = auth.currentUser.email;
+          const anggotaQuery = await anggotaCollection
+            .where("email", "==", currentUserEmail)
+            .limit(1)
+            .get();
+          if (anggotaQuery.empty) {
+            return;
+          }
+          const anggotaId = anggotaQuery.docs[0].id;
+
+          // Hitung Saldo Simpanan
+          const simpananQuery = await simpananCollection
+            .where("anggotaId", "==", anggotaId)
+            .get();
+          let saldoWajib = 0,
+            saldoSukarela = 0;
+          simpananQuery.forEach((doc) => {
+            const s = doc.data();
+            if (s.jenis === "Wajib") saldoWajib += s.jumlah;
+            else if (s.jenis === "Sukarela") saldoSukarela += s.jumlah;
+          });
+          document.getElementById("saldo-wajib").textContent =
+            formatRupiah(saldoWajib);
+          document.getElementById("saldo-sukarela").textContent =
+            formatRupiah(saldoSukarela);
+          document.getElementById("total-simpanan").textContent = formatRupiah(
+            saldoWajib + saldoSukarela
+          );
+
+          // Tampilkan Info Pinjaman
+          const pinjamanQuery = await pinjamanCollection
+            .where("anggotaId", "==", anggotaId)
+            .where("status", "in", ["Disetujui", "Menunggu Persetujuan"])
+            .orderBy("tanggalPengajuan", "desc")
+            .limit(1)
+            .get();
+          const infoPinjamanEl = document.getElementById(
+            "info-pinjaman-anggota"
+          );
+          if (pinjamanQuery.empty) {
+            infoPinjamanEl.innerHTML =
+              '<p class="text-gray-500">Anda tidak memiliki pinjaman aktif.</p>';
+          } else {
+            const pinjaman = pinjamanQuery.docs[0].data();
+            const statusClass = `status-${pinjaman.status
+              .toLowerCase()
+              .replace(" ", "-")}`;
+            infoPinjamanEl.innerHTML = `
+                        <p class="text-lg">Jumlah Pinjaman: <span class="font-bold">${formatRupiah(
+                          pinjaman.jumlah
+                        )}</span></p>
+                        <p class="text-lg">Status: <span class="px-2 py-1 text-sm font-semibold rounded-full ${statusClass}">${
+              pinjaman.status
+            }</span></p>
+                    `;
+          }
+        } catch (error) {
+          console.error("Error menampilkan info pribadi: ", error);
+        }
+      }
+
+      // Tombol kembali ke dashboard
+      document.querySelectorAll(".back-to-dashboard").forEach((button) => {
+        button.addEventListener("click", () => showView("dashboard-section"));
+      });
+    </script>
+  </body>
+</html>
